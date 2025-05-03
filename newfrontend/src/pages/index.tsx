@@ -6,10 +6,10 @@ import {
   useCurrentAccount,
   useCurrentWallet,
   useSignPersonalMessage,
-} from "@mysten/dapp-kit";
+} from "@iota/dapp-kit";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import { metaMaskAvailable } from "@/sui-snap-wallet";
-import { registerSuiMateWallet } from "@/sui-mate-wallet";
+import { metaMaskAvailable } from "@/iota-snap-wallet";
+import { registerIotaMateWallet } from "@/iota-mate-wallet";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,7 +42,7 @@ export default function Home() {
         setFlaskInstalled(metaMaskState.available);
 
         // Register Sui Mate Wallet
-        registerSuiMateWallet();
+        registerIotaMateWallet();
       } catch (e) {
         setFlaskInstalled(false);
         console.error(e);
@@ -196,9 +196,9 @@ export default function Home() {
             height={38}
             priority
           />
-          <h1 className="text-3xl font-bold mt-8 mb-4">Sui Wallet Example</h1>
+          <h1 className="text-3xl font-bold mt-8 mb-4">Iota Wallet Example</h1>
           <p className="text-center text-gray-600 dark:text-gray-400 mb-4">
-            Connect to either Sui MetaMask Snap or Sui Mate Wallet
+            Connect to either Iota MetaMask Snap or Iota Mate Wallet
           </p>
 
           {error && (

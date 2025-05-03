@@ -4,7 +4,7 @@ import {
   ConnectModal,
   useCurrentAccount,
   useCurrentWallet,
-} from "@mysten/dapp-kit";
+} from "@iota/dapp-kit";
 import { Geist, Geist_Mono } from "next/font/google";
 
 const geistSans = Geist({
