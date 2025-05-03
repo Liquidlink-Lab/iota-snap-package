@@ -1,24 +1,24 @@
-import { useState, useEffect, useRef } from "react";
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
+import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
+import { Geist, Geist_Mono } from 'next/font/google';
 import {
   ConnectModal,
   useCurrentAccount,
   useCurrentWallet,
   useSignPersonalMessage,
-} from "@iota/dapp-kit";
-import { TransactionBlock } from "@mysten/sui.js/transactions";
-import { metaMaskAvailable } from "@/iota-snap-wallet";
-import { registerIotaMateWallet } from "@/iota-mate-wallet";
+} from '@iota/dapp-kit';
+import { TransactionBlock } from '@mysten/sui.js/transactions';
+import { metaMaskAvailable } from '@/iota-snap-wallet';
+import { registerIotaMateWallet } from '@/iota-mate-wallet';
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
 });
 
 export default function Home() {
@@ -41,7 +41,7 @@ export default function Home() {
         const metaMaskState = await metaMaskAvailable();
         setFlaskInstalled(metaMaskState.available);
 
-        // Register Sui Mate Wallet
+        // Register Iota Mate Wallet
         registerIotaMateWallet();
       } catch (e) {
         setFlaskInstalled(false);
@@ -55,8 +55,8 @@ export default function Home() {
   // Listen for messages from the popup window
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      if (event.data && event.data.type === "sui-mate-wallet-connected") {
-        console.log("Received connection from popup:", event.data);
+      if (event.data && event.data.type === 'sui-mate-wallet-connected') {
+        console.log('Received connection from popup:', event.data);
         setWaitingForConnection(false);
         setQrCodeKey(null);
         setShowQrCode(false);
@@ -64,9 +64,9 @@ export default function Home() {
       }
     };
 
-    window.addEventListener("message", handleMessage);
+    window.addEventListener('message', handleMessage);
     return () => {
-      window.removeEventListener("message", handleMessage);
+      window.removeEventListener('message', handleMessage);
     };
   }, []);
 
@@ -80,16 +80,16 @@ export default function Home() {
   }, []);
 
   const connectedToSnap =
-    isConnected && currentWallet?.name === "Sui MetaMask Snap";
+    isConnected && currentWallet?.name === 'Sui MetaMask Snap';
 
   const connectedToMateWallet =
-    isConnected && currentWallet?.name === "Sui Mate Wallet";
+    isConnected && currentWallet?.name === 'Sui Mate Wallet';
 
   // Handle QR code generation
   const handleGenerateQrCode = async () => {
     try {
       // Connect to WebSocket server
-      const ws = new WebSocket("ws://localhost:3001");
+      const ws = new WebSocket('ws://localhost:3001');
 
       // Wait for WebSocket to open
       await new Promise<void>((resolve) => {
@@ -99,8 +99,8 @@ export default function Home() {
       // Request connection key
       ws.send(
         JSON.stringify({
-          id: "req-" + Date.now(),
-          method: "requestConnectionKey",
+          id: 'req-' + Date.now(),
+          method: 'requestConnectionKey',
           params: {},
         })
       );
@@ -118,7 +118,7 @@ export default function Home() {
 
       if (response.error) {
         throw new Error(
-          response.error.message || "Failed to get connection key"
+          response.error.message || 'Failed to get connection key'
         );
       }
 
@@ -131,18 +131,18 @@ export default function Home() {
       const connectUrl = `${window.location.origin}/connect?key=${key}`;
       popupRef.current = window.open(
         connectUrl,
-        "SuiMateWalletConnect",
-        "width=500,height=700"
+        'SuiMateWalletConnect',
+        'width=500,height=700'
       );
     } catch (error) {
-      console.error("Error generating QR code:", error);
+      console.error('Error generating QR code:', error);
       setError((error as Error).message);
     }
   };
 
   const handleConnectError = (error: any) => {
     if (error) {
-      if (typeof error === "string") {
+      if (typeof error === 'string') {
         setError(error);
       } else {
         setError((error as Error).message);
@@ -157,8 +157,8 @@ export default function Home() {
     }
 
     const messageText = connectedToMateWallet
-      ? "Hello Sui Mate Wallet!"
-      : "Hello Sui Snap!";
+      ? 'Hello Sui Mate Wallet!'
+      : 'Hello Sui Snap!';
 
     signPersonalMessage(
       {
@@ -171,7 +171,7 @@ export default function Home() {
           setSignatureResult(JSON.stringify(result, null, 2));
         },
         onError: (e) => {
-          if (typeof e === "string") {
+          if (typeof e === 'string') {
             setError(e);
           } else {
             setError((e as Error).message);
@@ -241,8 +241,8 @@ export default function Home() {
               disabled={waitingForConnection}
             >
               {waitingForConnection
-                ? "Waiting for Connection..."
-                : "Connect with QR Code"}
+                ? 'Waiting for Connection...'
+                : 'Connect with QR Code'}
             </button>
 
             {showQrCode && qrCodeKey && (
@@ -273,7 +273,7 @@ export default function Home() {
                 <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-md">
                   <h3 className="font-bold mb-2">Connected Account</h3>
                   <p className="text-sm mb-2">
-                    <span className="font-semibold">Wallet:</span>{" "}
+                    <span className="font-semibold">Wallet:</span>{' '}
                     {currentWallet?.name}
                   </p>
                   <p className="font-mono text-sm break-all">

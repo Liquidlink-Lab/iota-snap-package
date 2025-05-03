@@ -21,11 +21,11 @@ import {
   Wallet,
   WalletAccount,
   getWallets,
-} from "@mysten/wallet-standard";
-import { ICON } from "./icon";
-import { MetaMaskInpageProvider } from "@metamask/providers";
+} from '@mysten/wallet-standard';
+import { ICON } from './icon';
+import { MetaMaskInpageProvider } from '@metamask/providers';
 type BaseProvider = MetaMaskInpageProvider;
-import detectEthereumProvider from "@metamask/detect-provider";
+import detectEthereumProvider from '@metamask/detect-provider';
 import {
   SerializedAdminSetFullnodeUrl,
   SerializedWalletAccount,
@@ -34,20 +34,20 @@ import {
   serializeSuiSignAndExecuteTransactionBlockInput,
   serializeSuiSignMessageInput,
   serializeSuiSignTransactionBlockInput,
-} from "./types";
-import { convertError } from "./errors";
+} from './types';
+import { convertError } from './errors';
 
-export * from "./types";
-export * from "./errors";
+export * from './types';
+export * from './errors';
 
-export const SNAP_ORIGIN = "npm:@3mate/sui-metamask-snap";
-export const SNAP_VERSION = "^0.0.1";
+export const SNAP_ORIGIN = 'npm:@3mate/sui-metamask-snap';
+export const SNAP_VERSION = '^0.0.1';
 
 export function registerSuiSnapWallet(): Wallet {
   const wallets = getWallets();
   for (const wallet of wallets.get()) {
     if (wallet.name === SuiSnapWallet.NAME) {
-      console.warn("SuiSnapWallet already registered");
+      console.warn('SuiSnapWallet already registered');
       return wallet;
     }
   }
@@ -61,11 +61,11 @@ export async function getAccounts(
   provider: BaseProvider
 ): Promise<ReadonlyWalletAccount[]> {
   const res = (await provider.request({
-    method: "wallet_invokeSnap",
+    method: 'wallet_invokeSnap',
     params: {
       snapId: SNAP_ORIGIN,
       request: {
-        method: "getAccounts",
+        method: 'getAccounts',
       },
     },
   })) as [SerializedWalletAccount];
@@ -77,11 +77,11 @@ export async function getAccounts(
 
 export async function admin_getStoredState(provider: BaseProvider) {
   const res = (await provider.request({
-    method: "wallet_invokeSnap",
+    method: 'wallet_invokeSnap',
     params: {
       snapId: SNAP_ORIGIN,
       request: {
-        method: "admin_getStoredState",
+        method: 'admin_getStoredState',
       },
     },
   })) as StoredState;
@@ -91,7 +91,7 @@ export async function admin_getStoredState(provider: BaseProvider) {
 
 export async function admin_setFullnodeUrl(
   provider: BaseProvider,
-  network: "mainnet" | "testnet" | "devnet" | "localnet",
+  network: 'mainnet' | 'testnet' | 'devnet' | 'localnet',
   url: string
 ) {
   const params: SerializedAdminSetFullnodeUrl = {
@@ -99,11 +99,11 @@ export async function admin_setFullnodeUrl(
     url,
   };
   await provider.request({
-    method: "wallet_invokeSnap",
+    method: 'wallet_invokeSnap',
     params: {
       snapId: SNAP_ORIGIN,
       request: {
-        method: "admin_setFullnodeUrl",
+        method: 'admin_setFullnodeUrl',
         params: JSON.parse(JSON.stringify(params)),
       },
     },
@@ -118,11 +118,11 @@ export async function signPersonalMessage(
 
   try {
     return (await provider.request({
-      method: "wallet_invokeSnap",
+      method: 'wallet_invokeSnap',
       params: {
         snapId: SNAP_ORIGIN,
         request: {
-          method: "signPersonalMessage",
+          method: 'signPersonalMessage',
           params: JSON.parse(JSON.stringify(serialized)),
         },
       },
@@ -152,11 +152,11 @@ export async function signTransactionBlock(
 
   try {
     return (await provider.request({
-      method: "wallet_invokeSnap",
+      method: 'wallet_invokeSnap',
       params: {
         snapId: SNAP_ORIGIN,
         request: {
-          method: "signTransactionBlock",
+          method: 'signTransactionBlock',
           params: JSON.parse(JSON.stringify(serialized)),
         },
       },
@@ -175,11 +175,11 @@ export async function signAndExecuteTransactionBlock(
 
   try {
     return (await provider.request({
-      method: "wallet_invokeSnap",
+      method: 'wallet_invokeSnap',
       params: {
         snapId: SNAP_ORIGIN,
         request: {
-          method: "signAndExecuteTransactionBlock",
+          method: 'signAndExecuteTransactionBlock',
           params: JSON.parse(JSON.stringify(serialized)),
         },
       },
@@ -216,12 +216,12 @@ export async function metaMaskAvailable(): Promise<MetaMaskStatus> {
   }
   try {
     const version = await provider.request<string>({
-      method: "web3_clientVersion",
+      method: 'web3_clientVersion',
     });
     const snaps = await provider.request<Record<string, unknown>>({
-      method: "wallet_getSnaps",
+      method: 'wallet_getSnaps',
     });
-    const suiSnapInstalled = !!snaps && "npm:@3mate/sui-metamask-snap" in snaps;
+    const suiSnapInstalled = !!snaps && 'npm:@3mate/sui-metamask-snap' in snaps;
 
     return {
       available: true,
@@ -240,7 +240,7 @@ export async function metaMaskAvailable(): Promise<MetaMaskStatus> {
 }
 
 export class SuiSnapWallet implements Wallet {
-  static NAME = "Sui MetaMask Snap";
+  static NAME = 'Sui MetaMask Snap';
   #connecting: boolean;
   #connected: boolean;
 
@@ -252,7 +252,7 @@ export class SuiSnapWallet implements Wallet {
   }
 
   get version() {
-    return "1.0.0" as const;
+    return '1.0.0' as const;
   }
 
   get name() {
@@ -284,32 +284,32 @@ export class SuiSnapWallet implements Wallet {
     SuiFeatures &
     StandardEventsFeature {
     return {
-      "standard:connect": {
-        version: "1.0.0" as any,
+      'standard:connect': {
+        version: '1.0.0' as any,
         connect: this.#connect,
       },
-      "standard:disconnect": {
-        version: "1.0.0" as any,
+      'standard:disconnect': {
+        version: '1.0.0' as any,
         disconnect: this.#disconnect,
       },
-      "sui:signPersonalMessage": {
-        version: "1.0.0" as any,
+      'sui:signPersonalMessage': {
+        version: '1.0.0' as any,
         signPersonalMessage: this.#signPersonalMessage,
       },
-      "sui:signMessage": {
-        version: "1.0.0" as any,
+      'sui:signMessage': {
+        version: '1.0.0' as any,
         signMessage: this.#signMessage,
       },
-      "sui:signTransactionBlock": {
-        version: "1.0.0" as any,
+      'sui:signTransactionBlock': {
+        version: '1.0.0' as any,
         signTransactionBlock: this.#signTransactionBlock,
       },
-      "sui:signAndExecuteTransactionBlock": {
-        version: "1.0.0" as any,
+      'sui:signAndExecuteTransactionBlock': {
+        version: '1.0.0' as any,
         signAndExecuteTransactionBlock: this.#signAndExecuteTransactionBlock,
       },
-      "standard:events": {
-        version: "1.0.0" as any,
+      'standard:events': {
+        version: '1.0.0' as any,
         on: () => {
           return () => {};
         },
@@ -319,7 +319,7 @@ export class SuiSnapWallet implements Wallet {
 
   #connect: StandardConnectMethod = async () => {
     if (this.#connecting) {
-      throw new Error("Already connecting");
+      throw new Error('Already connecting');
     }
 
     this.#connecting = true;
@@ -330,16 +330,16 @@ export class SuiSnapWallet implements Wallet {
         silent: true,
       })) as BaseProvider | null;
       if (!provider) {
-        throw new Error("MetaMask not detected!");
+        throw new Error('MetaMask not detected!');
       }
 
       const mmStatus = await metaMaskAvailable();
       if (!mmStatus.available) {
-        throw new Error("MetaMask not detected!");
+        throw new Error('MetaMask not detected!');
       }
 
       await provider.request({
-        method: "wallet_requestSnaps",
+        method: 'wallet_requestSnaps',
         params: {
           [SNAP_ORIGIN]: {
             version: SNAP_VERSION,
@@ -373,7 +373,7 @@ export class SuiSnapWallet implements Wallet {
       silent: true,
     })) as BaseProvider | null;
     if (!provider) {
-      throw new Error("MetaMask not detected!");
+      throw new Error('MetaMask not detected!');
     }
     return signPersonalMessage(provider, messageInput);
   };
@@ -383,7 +383,7 @@ export class SuiSnapWallet implements Wallet {
       silent: true,
     })) as BaseProvider | null;
     if (!provider) {
-      throw new Error("MetaMask not detected!");
+      throw new Error('MetaMask not detected!');
     }
     return signMessage(provider, messageInput);
   };
@@ -395,7 +395,7 @@ export class SuiSnapWallet implements Wallet {
       silent: true,
     })) as BaseProvider | null;
     if (!provider) {
-      throw new Error("MetaMask not detected!");
+      throw new Error('MetaMask not detected!');
     }
     return signTransactionBlock(provider, transactionInput);
   };
@@ -406,7 +406,7 @@ export class SuiSnapWallet implements Wallet {
         silent: true,
       })) as BaseProvider | null;
       if (!provider) {
-        throw new Error("MetaMask not detected!");
+        throw new Error('MetaMask not detected!');
       }
       return signAndExecuteTransactionBlock(provider, transactionInput);
     };

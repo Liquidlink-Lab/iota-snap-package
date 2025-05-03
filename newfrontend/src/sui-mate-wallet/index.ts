@@ -21,28 +21,28 @@ import {
   Wallet,
   WalletAccount,
   getWallets,
-} from "@mysten/wallet-standard";
-import { ICON } from "./icon";
+} from '@mysten/wallet-standard';
+import { ICON } from './icon';
 import {
   SerializedWalletAccount,
   serializeSuiSignAndExecuteTransactionBlockInput,
   serializeSuiSignMessageInput,
   serializeSuiSignTransactionBlockInput,
-} from "./types";
-import { convertError, SuiSnapError } from "./errors";
-import QRCode from "qrcode";
+} from './types';
+import { convertError, SuiSnapError } from './errors';
+import QRCode from 'qrcode';
 
-export * from "./types";
-export * from "./errors";
+export * from './types';
+export * from './errors';
 
 // WebSocket server URL
-export const WEBSOCKET_SERVER_URL = "ws://localhost:3001";
+export const WEBSOCKET_SERVER_URL = 'ws://localhost:3001';
 
 export function registerSuiMateWallet(): Wallet {
   const wallets = getWallets();
   for (const wallet of wallets.get()) {
     if (wallet.name === SuiMateWallet.NAME) {
-      console.warn("SuiMateWallet already registered");
+      console.warn('SuiMateWallet already registered');
       return wallet;
     }
   }
@@ -75,7 +75,7 @@ class WebSocketConnection {
 
   async connect(): Promise<ReadonlyWalletAccount[]> {
     if (this.isConnecting) {
-      throw new SuiSnapError("Already connecting to WebSocket");
+      throw new SuiSnapError('Already connecting to WebSocket');
     }
 
     if (this.isConnected && this.accounts) {
@@ -127,7 +127,7 @@ class WebSocketConnection {
         this.ws.onclose = this.handleClose;
         this.ws.onerror = (event) => {
           this.handleError(event);
-          reject(new SuiSnapError("WebSocket connection error"));
+          reject(new SuiSnapError('WebSocket connection error'));
         };
       } catch (error) {
         reject(error);
@@ -137,7 +137,7 @@ class WebSocketConnection {
 
   private async requestConnectionKey(): Promise<string> {
     if (!this.ws) {
-      throw new SuiSnapError("WebSocket not connected");
+      throw new SuiSnapError('WebSocket not connected');
     }
 
     return new Promise((resolve, reject) => {
@@ -148,7 +148,7 @@ class WebSocketConnection {
       this.ws!.send(
         JSON.stringify({
           id: requestId,
-          method: "requestConnectionKey",
+          method: 'requestConnectionKey',
           params: {},
         })
       );
@@ -157,7 +157,7 @@ class WebSocketConnection {
       setTimeout(() => {
         if (this.resolvers.has(requestId)) {
           this.resolvers.delete(requestId);
-          reject(new SuiSnapError("Connection key request timeout"));
+          reject(new SuiSnapError('Connection key request timeout'));
         }
       }, 30000); // 30 seconds timeout
     });
@@ -173,13 +173,13 @@ class WebSocketConnection {
 
       // Create popup window
       const popupWindow = window.open(
-        "",
-        "SuiMateWalletQRCode",
-        "width=350,height=450"
+        '',
+        'SuiMateWalletQRCode',
+        'width=350,height=450'
       );
       if (!popupWindow) {
         throw new SuiSnapError(
-          "Could not open QR code popup. Please allow popups for this site."
+          'Could not open QR code popup. Please allow popups for this site.'
         );
       }
 
@@ -242,8 +242,8 @@ class WebSocketConnection {
         </html>
       `);
     } catch (error) {
-      console.error("Error showing QR code:", error);
-      throw new SuiSnapError("Failed to display QR code");
+      console.error('Error showing QR code:', error);
+      throw new SuiSnapError('Failed to display QR code');
     }
   }
 
@@ -251,7 +251,7 @@ class WebSocketConnection {
     key: string
   ): Promise<ReadonlyWalletAccount[]> {
     if (!this.ws) {
-      throw new SuiSnapError("WebSocket not connected");
+      throw new SuiSnapError('WebSocket not connected');
     }
 
     return new Promise((resolve, reject) => {
@@ -262,7 +262,7 @@ class WebSocketConnection {
       this.ws!.send(
         JSON.stringify({
           id: requestId,
-          method: "waitForAuthentication",
+          method: 'waitForAuthentication',
           params: { key },
         })
       );
@@ -271,7 +271,7 @@ class WebSocketConnection {
       setTimeout(() => {
         if (this.resolvers.has(requestId)) {
           this.resolvers.delete(requestId);
-          reject(new SuiSnapError("Authentication timeout"));
+          reject(new SuiSnapError('Authentication timeout'));
         }
       }, 300000); // 5 minutes timeout
     });
@@ -281,7 +281,7 @@ class WebSocketConnection {
     messageInput: SuiSignPersonalMessageInput
   ): Promise<SuiSignPersonalMessageOutput> {
     if (!this.ws || !this.isConnected || !this.connectionKey) {
-      throw new SuiSnapError("WebSocket not connected");
+      throw new SuiSnapError('WebSocket not connected');
     }
 
     const serialized = serializeSuiSignMessageInput(messageInput);
@@ -294,7 +294,7 @@ class WebSocketConnection {
       this.ws!.send(
         JSON.stringify({
           id: requestId,
-          method: "signPersonalMessage",
+          method: 'signPersonalMessage',
           params: {
             key: this.connectionKey,
             input: serialized,
@@ -306,7 +306,7 @@ class WebSocketConnection {
       setTimeout(() => {
         if (this.resolvers.has(requestId)) {
           this.resolvers.delete(requestId);
-          reject(new SuiSnapError("Sign personal message timeout"));
+          reject(new SuiSnapError('Sign personal message timeout'));
         }
       }, 60000); // 1 minute timeout
     });
@@ -327,7 +327,7 @@ class WebSocketConnection {
     transactionInput: SuiSignTransactionBlockInput
   ): Promise<SuiSignTransactionBlockOutput> {
     if (!this.ws || !this.isConnected || !this.connectionKey) {
-      throw new SuiSnapError("WebSocket not connected");
+      throw new SuiSnapError('WebSocket not connected');
     }
 
     const serialized = serializeSuiSignTransactionBlockInput(transactionInput);
@@ -340,7 +340,7 @@ class WebSocketConnection {
       this.ws!.send(
         JSON.stringify({
           id: requestId,
-          method: "signTransactionBlock",
+          method: 'signTransactionBlock',
           params: {
             key: this.connectionKey,
             input: serialized,
@@ -352,7 +352,7 @@ class WebSocketConnection {
       setTimeout(() => {
         if (this.resolvers.has(requestId)) {
           this.resolvers.delete(requestId);
-          reject(new SuiSnapError("Sign transaction block timeout"));
+          reject(new SuiSnapError('Sign transaction block timeout'));
         }
       }, 60000); // 1 minute timeout
     });
@@ -362,7 +362,7 @@ class WebSocketConnection {
     transactionInput: SuiSignTransactionBlockInput
   ): Promise<SuiSignAndExecuteTransactionBlockOutput> {
     if (!this.ws || !this.isConnected || !this.connectionKey) {
-      throw new SuiSnapError("WebSocket not connected");
+      throw new SuiSnapError('WebSocket not connected');
     }
 
     const serialized =
@@ -376,7 +376,7 @@ class WebSocketConnection {
       this.ws!.send(
         JSON.stringify({
           id: requestId,
-          method: "signAndExecuteTransactionBlock",
+          method: 'signAndExecuteTransactionBlock',
           params: {
             key: this.connectionKey,
             input: serialized,
@@ -389,7 +389,7 @@ class WebSocketConnection {
         if (this.resolvers.has(requestId)) {
           this.resolvers.delete(requestId);
           reject(
-            new SuiSnapError("Sign and execute transaction block timeout")
+            new SuiSnapError('Sign and execute transaction block timeout')
           );
         }
       }, 120000); // 2 minutes timeout
@@ -405,13 +405,13 @@ class WebSocketConnection {
         this.resolvers.delete(data.id);
 
         if (data.error) {
-          reject(new SuiSnapError(data.error.message || "Unknown error"));
+          reject(new SuiSnapError(data.error.message || 'Unknown error'));
         } else {
           resolve(data.result);
         }
       }
     } catch (error) {
-      console.error("Error handling WebSocket message:", error);
+      console.error('Error handling WebSocket message:', error);
     }
   }
 
@@ -429,7 +429,7 @@ class WebSocketConnection {
   }
 
   private handleError(event: Event): void {
-    console.error("WebSocket error:", event);
+    console.error('WebSocket error:', event);
   }
 
   private generateRequestId(): string {
@@ -439,11 +439,11 @@ class WebSocketConnection {
 
 // Check if WebSocket is available in the environment
 export function isWebSocketAvailable(): boolean {
-  return typeof WebSocket !== "undefined";
+  return typeof WebSocket !== 'undefined';
 }
 
 export class SuiMateWallet implements Wallet {
-  static NAME = "Sui Mate Wallet";
+  static NAME = 'Sui Mate Wallet';
   #connecting: boolean;
   #connected: boolean;
   #accounts: WalletAccount[] | null = null;
@@ -456,7 +456,7 @@ export class SuiMateWallet implements Wallet {
   }
 
   get version() {
-    return "1.0.0" as const;
+    return '1.0.0' as const;
   }
 
   get name() {
@@ -488,32 +488,32 @@ export class SuiMateWallet implements Wallet {
     SuiFeatures &
     StandardEventsFeature {
     return {
-      "standard:connect": {
-        version: "1.0.0" as any,
+      'standard:connect': {
+        version: '1.0.0' as any,
         connect: this.#connect,
       },
-      "standard:disconnect": {
-        version: "1.0.0" as any,
+      'standard:disconnect': {
+        version: '1.0.0' as any,
         disconnect: this.#disconnect,
       },
-      "sui:signPersonalMessage": {
-        version: "1.0.0" as any,
+      'sui:signPersonalMessage': {
+        version: '1.0.0' as any,
         signPersonalMessage: this.#signPersonalMessage,
       },
-      "sui:signMessage": {
-        version: "1.0.0" as any,
+      'sui:signMessage': {
+        version: '1.0.0' as any,
         signMessage: this.#signMessage,
       },
-      "sui:signTransactionBlock": {
-        version: "1.0.0" as any,
+      'sui:signTransactionBlock': {
+        version: '1.0.0' as any,
         signTransactionBlock: this.#signTransactionBlock,
       },
-      "sui:signAndExecuteTransactionBlock": {
-        version: "1.0.0" as any,
+      'sui:signAndExecuteTransactionBlock': {
+        version: '1.0.0' as any,
         signAndExecuteTransactionBlock: this.#signAndExecuteTransactionBlock,
       },
-      "standard:events": {
-        version: "1.0.0" as any,
+      'standard:events': {
+        version: '1.0.0' as any,
         on: () => {
           return () => {};
         },
@@ -523,11 +523,11 @@ export class SuiMateWallet implements Wallet {
 
   #connect: StandardConnectMethod = async () => {
     if (this.#connecting) {
-      throw new Error("Already connecting");
+      throw new Error('Already connecting');
     }
 
     if (!isWebSocketAvailable()) {
-      throw new Error("WebSocket is not available in this environment");
+      throw new Error('WebSocket is not available in this environment');
     }
 
     this.#connecting = true;
@@ -559,7 +559,7 @@ export class SuiMateWallet implements Wallet {
 
   #signPersonalMessage: SuiSignPersonalMessageMethod = async (messageInput) => {
     if (!this.#connected) {
-      throw new Error("Wallet not connected");
+      throw new Error('Wallet not connected');
     }
 
     try {
@@ -571,7 +571,7 @@ export class SuiMateWallet implements Wallet {
 
   #signMessage: SuiSignMessageMethod = async (messageInput) => {
     if (!this.#connected) {
-      throw new Error("Wallet not connected");
+      throw new Error('Wallet not connected');
     }
 
     try {
@@ -585,7 +585,7 @@ export class SuiMateWallet implements Wallet {
     transactionInput
   ) => {
     if (!this.#connected) {
-      throw new Error("Wallet not connected");
+      throw new Error('Wallet not connected');
     }
 
     try {
@@ -598,7 +598,7 @@ export class SuiMateWallet implements Wallet {
   #signAndExecuteTransactionBlock: SuiSignAndExecuteTransactionBlockMethod =
     async (transactionInput) => {
       if (!this.#connected) {
-        throw new Error("Wallet not connected");
+        throw new Error('Wallet not connected');
       }
 
       try {

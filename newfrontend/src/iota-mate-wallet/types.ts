@@ -1,16 +1,11 @@
+import { Transaction } from '@iota/sdk';
 import {
-  ExecuteTransactionRequestType,
-  SuiTransactionBlockResponseOptions,
-} from "@mysten/sui.js/client";
-import { TransactionBlock } from "@mysten/sui.js/transactions";
-import { fromB64, toB64 } from "@mysten/sui.js/utils";
-import {
-  SuiSignAndExecuteTransactionBlockInput,
-  SuiSignPersonalMessageInput,
-  SuiSignTransactionBlockInput,
+  IotaSignAndExecuteTransactionInput,
+  IotaSignPersonalMessageInput,
+  IotaSignTransactionInput,
   WalletAccount,
   WalletIcon,
-} from "@mysten/wallet-standard";
+} from '@iota/wallet-standard';
 
 /**
  * Passing in objects directly to the Snap sometimes doesn't work correctly so we need to serialize to primitive values
@@ -33,7 +28,7 @@ export function serializeWalletAccount(
 ): SerializedWalletAccount {
   return {
     address: account.address,
-    publicKey: toB64(account.publicKey as Uint8Array),
+    publicKey: Buffer.from(account.publicKey).toString('base64'),
     features: [...account.features],
     chains: [...account.chains],
     label: account.label,
@@ -46,7 +41,7 @@ export function deserializeWalletAccount(
 ): WalletAccount {
   return {
     address: account.address,
-    publicKey: fromB64(account.publicKey),
+    publicKey: Buffer.from(account.publicKey, 'base64'),
     chains: account.chains.map((chain) => chain as `${string}:${string}`),
     features: account.features.map(
       (feature) => feature as `${string}:${string}`
@@ -56,90 +51,96 @@ export function deserializeWalletAccount(
   };
 }
 
-/* ======== SerializedSuiSignMessageInput ======== */
+/* ======== SerializedIotaSignMessageInput ======== */
 
-export interface SerializedSuiSignMessageInput {
+export interface SerializedIotaSignMessageInput {
   message: string;
   account: SerializedWalletAccount;
 }
 
-export function serializeSuiSignMessageInput(
-  input: SuiSignPersonalMessageInput
-): SerializedSuiSignMessageInput {
+export function serializeIotaSignMessageInput(
+  input: IotaSignPersonalMessageInput
+): SerializedIotaSignMessageInput {
   return {
-    message: toB64(input.message),
+    message: Buffer.from(input.message).toString('base64'),
     account: serializeWalletAccount(input.account),
   };
 }
 
-export function deserializeSuiSignMessageInput(
-  input: SerializedSuiSignMessageInput
-): SuiSignPersonalMessageInput {
+export function deserializeIotaSignMessageInput(
+  input: SerializedIotaSignMessageInput
+): IotaSignPersonalMessageInput {
   return {
-    message: fromB64(input.message),
+    message: Buffer.from(input.message, 'base64'),
     account: deserializeWalletAccount(input.account),
   };
 }
 
-/* ======== SerializedSuiSignTransactionBlockInput ======== */
+/* ======== SerializedIotaSignTransactionInput ======== */
 
-export interface SerializedSuiSignTransactionBlockInput {
-  transactionBlock: string;
+export interface SerializedIotaSignTransactionInput {
+  transaction: string;
   account: SerializedWalletAccount;
   chain: string;
 }
 
-export function serializeSuiSignTransactionBlockInput(
-  input: SuiSignTransactionBlockInput
-): SerializedSuiSignTransactionBlockInput {
+export function serializeIotaSignTransactionInput(
+  input: IotaSignTransactionInput
+): SerializedIotaSignTransactionInput {
   return {
-    transactionBlock: input.transactionBlock.serialize(),
+    transaction:
+      typeof input.transaction === 'string'
+        ? input.transaction
+        : JSON.stringify(input.transaction),
     account: serializeWalletAccount(input.account),
     chain: input.chain,
   };
 }
 
-export function deserializeSuiSignTransactionBlockInput(
-  input: SerializedSuiSignTransactionBlockInput
-): SuiSignTransactionBlockInput {
+export function deserializeIotaSignTransactionInput(
+  input: SerializedIotaSignTransactionInput
+): IotaSignTransactionInput {
   return {
-    transactionBlock: TransactionBlock.from(input.transactionBlock) as any,
+    transaction:
+      typeof input.transaction === 'string'
+        ? input.transaction
+        : JSON.parse(input.transaction),
     account: deserializeWalletAccount(input.account),
     chain: input.chain as `${string}:${string}`,
   };
 }
 
-/* ======== SerializedSuiSignAndExecuteTransactionBlockInput ======== */
+/* ======== SerializedIotaSignAndExecuteTransactionInput ======== */
 
-export interface SerializedSuiSignAndExecuteTransactionBlockInput {
-  transactionBlock: string;
+export interface SerializedIotaSignAndExecuteTransactionInput {
+  transaction: string;
   account: SerializedWalletAccount;
   chain: string;
-  requestType?: string;
-  options?: SuiTransactionBlockResponseOptions;
 }
 
-export function serializeSuiSignAndExecuteTransactionBlockInput(
-  input: SuiSignAndExecuteTransactionBlockInput
-): SerializedSuiSignAndExecuteTransactionBlockInput {
+export function serializeIotaSignAndExecuteTransactionInput(
+  input: IotaSignAndExecuteTransactionInput
+): SerializedIotaSignAndExecuteTransactionInput {
   return {
-    transactionBlock: input.transactionBlock.serialize(),
+    transaction:
+      typeof input.transaction === 'string'
+        ? input.transaction
+        : JSON.stringify(input.transaction),
     account: serializeWalletAccount(input.account),
     chain: input.chain,
-    requestType: input.requestType,
-    options: input.options,
   };
 }
 
-export function deserializeSuiSignAndExecuteTransactionBlockInput(
-  input: SerializedSuiSignAndExecuteTransactionBlockInput
-): SuiSignAndExecuteTransactionBlockInput {
+export function deserializeIotaSignAndExecuteTransactionInput(
+  input: SerializedIotaSignAndExecuteTransactionInput
+): IotaSignAndExecuteTransactionInput {
   return {
-    ...input,
-    transactionBlock: TransactionBlock.from(input.transactionBlock) as any,
+    transaction:
+      typeof input.transaction === 'string'
+        ? input.transaction
+        : JSON.parse(input.transaction),
     account: deserializeWalletAccount(input.account),
     chain: input.chain as `${string}:${string}`,
-    requestType: input.requestType as ExecuteTransactionRequestType | undefined,
   };
 }
 
@@ -155,6 +156,6 @@ export interface StoredState {
 /* ======== SerializedAdminSetFullnodeUrl ======== */
 
 export interface SerializedAdminSetFullnodeUrl {
-  network: "mainnet" | "testnet" | "devnet" | "localnet";
+  network: 'mainnet' | 'testnet' | 'devnet' | 'localnet';
   url: string;
 }

@@ -1,16 +1,16 @@
 import {
   ExecuteTransactionRequestType,
   SuiTransactionBlockResponseOptions,
-} from "@mysten/sui.js/client";
-import { TransactionBlock } from "@mysten/sui.js/transactions";
-import { fromB64, toB64 } from "@mysten/sui.js/utils";
+} from '@mysten/sui.js/client';
+import { TransactionBlock } from '@mysten/sui.js/transactions';
+import { fromB64, toB64 } from '@mysten/sui.js/utils';
 import {
   SuiSignAndExecuteTransactionBlockInput,
   SuiSignPersonalMessageInput,
   SuiSignTransactionBlockInput,
   WalletAccount,
   WalletIcon,
-} from "@mysten/wallet-standard";
+} from '@mysten/wallet-standard';
 
 /**
  * Passing in objects directly to the Snap sometimes doesn't work correctly so we need to serialize to primitive values
@@ -155,6 +155,6 @@ export interface StoredState {
 /* ======== SerializedAdminSetFullnodeUrl ======== */
 
 export interface SerializedAdminSetFullnodeUrl {
-  network: "mainnet" | "testnet" | "devnet" | "localnet";
+  network: 'mainnet' | 'testnet' | 'devnet' | 'localnet';
   url: string;
 }
