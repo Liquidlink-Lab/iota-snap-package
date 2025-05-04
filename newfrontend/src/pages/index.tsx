@@ -8,8 +8,8 @@ import {
   useSignPersonalMessage,
 } from "@mysten/dapp-kit";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import { metaMaskAvailable } from "@/sui-snap-wallet";
-import { registerSuiMateWallet } from "@/sui-mate-wallet";
+import { metaMaskAvailable } from "@/iota-snap-wallet";
+import { registerSuiMateWallet } from "@/iota-mate-wallet";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

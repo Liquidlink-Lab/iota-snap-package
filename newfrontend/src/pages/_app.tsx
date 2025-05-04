@@ -6,7 +6,7 @@ import {
   WalletProvider,
   createNetworkConfig,
 } from "@mysten/dapp-kit";
-import { registerSuiSnapWallet } from "@/sui-snap-wallet";
+import { registerSuiSnapWallet } from "@/iota-snap-wallet";
 import "@mysten/dapp-kit/dist/index.css";
 
 // Register the Sui Snap wallet
